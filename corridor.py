@@ -21,6 +21,7 @@ class Corridor_generator:
 	SOUTH = 2
 	WEST = 3
 	CORRIDOR_FLOOR_CODE = 2
+	CORRIDOR_FLOOR_ALT = 1
 
 
 	
@@ -81,10 +82,16 @@ class Corridor_generator:
 
 
 			j = 0
-			while j < direction_length and not finish:
-				x, y = self._update_point(x, y, direction)
 
-				corridor[y][x] = Corridor_generator.CORRIDOR_FLOOR_CODE
+			first_in_direction = True
+			while j < direction_length and not finish:
+
+				x, y = self._update_point(x, y, direction)
+				if first_in_direction:
+					corridor[y][x] = Corridor_generator.CORRIDOR_FLOOR_ALT
+					first_in_direction = False
+				else:	
+					corridor[y][x] = Corridor_generator.CORRIDOR_FLOOR_CODE
 				if DEBUG:
 					print(x, y)
 
