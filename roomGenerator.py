@@ -183,5 +183,3 @@ def generate():
 
     return_matrix = np.matrix(bounded)
     return return_matrix
-
-print(generate())
