@@ -19,37 +19,18 @@ LEFT = 3
 #         useable coordinates x, y if it can.
 def can_be_placed(room, top_left_x, top_left_y, side):
     # Do we need to find a place to put the room along the x or y axis?
-    test_range = 8
-    if side == "U" or side == "D":
-        range = len(room[0])
-    else:
-        range = len(room)
 
+    return 0, 0
 
-    for i in range(len(room)):
-        for j in range(len(room[i]):
-            if room[i][j] == 1 and dungeon[top_left_x+j][top_left_y+i] != 0:
-                return False
-
-
-# Generate a room that can be placed
-#
-# INPUT: x, y coord of ajoining corridor and side "U", "R", "D", "L"
-# OUTPUT: room and top_left position if one is found in num_attempts
-#         -1 if none can be found.
-def find_room(x,y,side):
-    tries = 0
-    num_attempts = 5
-    while tries < num_attempts:
-        room = roomGenerator.generate_random_room()
-        if can_be_placed(room, x, y, side) != -1:
-            return room, can_be_placed(room, x, y, side)
-        tries += 1
-    return -1, -1, -1
 
 # Generate a room that works and place it in the dungeon
-def place_room(x,y,side):
-    room, origin_x, origin_y = find_room(x,y,side)
+def place_element(element, r_top_left_x, r_top_left_y):
+
+    for i in range(element.shape[0]):
+        for j in range(element.shape[1]):
+            if element[i][j] != 0:
+                # copy it in the dungeon matrix
+                dungeon[i+r_top_left_y][j+r_top_left_x] = element[i][j]
 
 
 
@@ -59,20 +40,22 @@ def corridor_can_be_placed(corridor_matrix, x_d, y_d, x_c, y_c):
     failure = False
     finish = False
     
+    last_direction = None
+
     while not finish:
         # check around the current point's corridor to get the next point
         direction = None
 
-        if y_c + 1 < corridor_matrix.shape[0] and corridor_matrix[y_c+1][x_c] == 1:
+        if last_direction != UP and y_c + 1 < corridor_matrix.shape[0] and corridor_matrix[y_c+1][x_c] != 0:
             direction = DOWN
             y_c += 1
-        elif y_c - 1 >= 0 and corridor_matrix[y_c-1][x_c] == 1:
+        elif last_direction != DOWN and y_c - 1 >= 0 and corridor_matrix[y_c-1][x_c] != 0:
             direction = UP
             y_c -= 1
-        elif x_c + 1 < corridor_matrix.shape[1] and corridor_matrix[y_c][x_c+1] == 1:
+        elif last_direction != LEFT and x_c + 1 < corridor_matrix.shape[1] and corridor_matrix[y_c][x_c+1] != 0:
             direction = RIGHT
             x_c += 1
-        elif x_c - 1 >= 0 and corridor_matrix[y_c][x_c-1] == 1:
+        elif last_direction != RIGHT and x_c - 1 >= 0 and corridor_matrix[y_c][x_c-1] != 0:
             direction = LEFT
             x_c -= 1
         else:
@@ -81,7 +64,7 @@ def corridor_can_be_placed(corridor_matrix, x_d, y_d, x_c, y_c):
 
         # check if the next point is a 0 in the dungeon matrix
         if not finish:
-            if y_d+1 <= dungeon.shape[0] direction == DOWN and dungeon[y_d+1][x_d] == 0:
+            if y_d+1 <= dungeon.shape[0] and direction == DOWN and dungeon[y_d+1][x_d] == 0:
                 y_d += 1
             elif y_d-1 >= 0 and direction == UP and dungeon[y_d-1][x_d] == 0:
                 y_d -= 1
@@ -95,31 +78,47 @@ def corridor_can_be_placed(corridor_matrix, x_d, y_d, x_c, y_c):
         if failure:
             finish = True
 
+        last_direction = direction
+
     return not failure
 
 
 def generate_corridor_and_room(n, m, x, y, direction):
-    failure = False
+    failure = True
 
     for _ in range(n):
-        corridor, ending_point, end_direction = cor_generator.generate(direction)
-        if corridor_can_be_placed(corridor, x, y, ending_point[0], ending_point[1]):
-            # generate and place the room
+        corridor, ending_point, starting_point, end_direction = cor_generator.generate(direction)
+        if corridor_can_be_placed(corridor, x, y, starting_point[0], starting_point[1]):
+            for __ in range(m):
+                room = roomGenerator.generate_random_room()
+                r_top_left_x, r_top_left_y = room_can_be_placed(room, ending_point[0], ending_point[1], direction)
+                if d_top_left_x != -1:
+
+                    # get the topleft coordinate of the corridor matrix IN the dungeon matrix
+                    c_top_left_x = x - starting_point[0]
+                    c_top_left_y = y - starting_point[1]
+                    # place the room
+                    place_relement(room, r_top_left_x, r_top_left_y)
+                    place_element(corridor, c_top_left_x, c_top_left_y)
+                    failure = False
+                    break # finished
+
+    
+    return failure   
 
 
 
 
+# cor_generator = Corridor_generator(10, 3, 13)
 
-cor_generator = Corridor_generator(10, 3, 13)
-
-# 100x100 matrix of 0s
-dungeon = np.zeros((100,100))
+# # 100x100 matrix of 0s
+dungeon = np.zeros((50,50))
 room_stack = []
 
-# Add entrance..
-dungeon[0,50] = 2
-dungeon[1,50] = 2
-place_room(2,50,"L")
+# # Add entrance..
+# dungeon[0,50] = 2
+# dungeon[1,50] = 2
+# place_room(2,50,"L")
 
 
 # for each non entry room, try to place corridor + room

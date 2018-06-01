@@ -94,7 +94,7 @@ class Corridor_generator:
 				if x >= self.matrix_size - 1 or y >= self.matrix_size - 1 or x <= 0 or y <= 0 or i >= corridor_length:
 					finish = True
 
-		return corridor, (x, y), direction
+		return corridor, (x, y), starting_point, direction
 
 
 
@@ -138,8 +138,6 @@ class Corridor_generator:
 			return Corridor_generator.EAST
 		if direction == Corridor_generator.NORTH:
 			return Corridor_generator.SOUTH
-
-
 
 	def _get_starting_point(self, direction):
 		
