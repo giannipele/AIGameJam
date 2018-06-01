@@ -1,0 +1,33 @@
+dtmc
+
+const double magic_num_1;
+const double magic_num_2;
+
+module rooms
+
+	num_rooms : [1..1000] init 1;
+	end : bool init false;
+	
+	[first_room]	num_rooms = 1 ->
+			(num_rooms' = num_rooms + 1);
+
+	[early_rooms]	num_rooms > 1 & num_rooms < 5 & !end ->
+			magic_num_1 * magic_num_1 : (num_rooms' = num_rooms + 2) +
+			magic_num_1 * (1-magic_num_1) : (num_rooms' = num_rooms + 1) +
+			magic_num_1 * (1-magic_num_1) : (num_rooms' = num_rooms + 1) +
+			(1 - magic_num_1) * (1 - magic_num_1) : (end' = true);
+			
+	[later_rooms]	num_rooms > 4 & num_rooms < 200 & !end ->
+			else_eq * else_eq : (num_rooms' = num_rooms + 2) +
+			else_eq * (1-else_eq) : (num_rooms' = num_rooms + 1) +
+			else_eq * (1-else_eq) : (num_rooms' = num_rooms + 1) +
+			(1 - else_eq) * (1 - else_eq) : (end' = true);
+			
+
+endmodule
+
+formula else_eq = magic_num_2 / num_rooms;
+
+rewards
+	true : num_rooms;
+endrewards

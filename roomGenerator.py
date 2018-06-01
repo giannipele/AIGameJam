@@ -209,7 +209,8 @@ def generate_random_room():
     elif seed == 2:
         return generate_big_room()
     return generate_huge_room()
-
+"""
 huge_room = generate_random_room()
 for line in huge_room:
     print(line)
+"""
