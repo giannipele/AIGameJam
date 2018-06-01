@@ -5,10 +5,25 @@ from corridor import Corridor_generator
 import numpy as np
 import random
 
+# PARAMETER
+
+MATRIX_DUNGEON_SIZE = 100
+MATRIX_CORRIDOR_SIZE = 8
+MIN_LENGTH_CORRIDOR = 3
+MAX_LENGTH_CORRIDOR = 10
+TRY_NUMBER_CORRIDOR = 5
+TRY_NUMBER_ROOM = 5
+
+
+
+
+
 UP = 0
 RIGHT = 1
 DOWN = 2
 LEFT = 3
+
+ROOM_FLOOR = 1
 
 def column(maxtrix, i):
     return [row[i] for row in matrix]
@@ -164,6 +179,7 @@ def corridor_can_be_placed(corridor_matrix, x_d, y_d, x_c, y_c):
 
 def generate_corridor_and_room(n, m, x, y, direction):
     failure = True
+    entry = None
 
     for _ in range(n):
         corridor, ending_point, starting_point, end_direction = cor_generator.generate(direction)
@@ -180,24 +196,74 @@ def generate_corridor_and_room(n, m, x, y, direction):
                     place_relement(room, r_top_left_x, r_top_left_y)
                     place_element(corridor, c_top_left_x, c_top_left_y)
                     failure = False
+
+                    if end_direction == UP:
+                        entry = DOWN
+                    if end_direction == DOWN:
+                        entry = UP
+                    if end_direction == RIGHT:
+                        entry = LEFT
+                    if end_direction == LEFT:
+                        entry = RIGHT
+
                     break # finished
 
     
-    return failure   
+    return failure, room, r_top_left_x, r_top_left_y, entry
 
 
 
-
-cor_generator = Corridor_generator(10, 3, 13)
+cor_generator = Corridor_generator(MATRIX_CORRIDOR_SIZE, MIN_LENGTH_CORRIDOR, MAX_LENGTH_CORRIDOR)
 
 # 100x100 matrix of 0s
-dungeon = np.zeros((100,100))
+dungeon = np.zeros((MATRIX_DUNGEON_SIZE,MATRIX_DUNGEON_SIZE))
 room_stack = []
 
 # Add entrance..
 dungeon[0,50] = 2
 dungeon[1,50] = 2
-print(find_room(2,50,DOWN))
+
+while room_stack:
+    room, r_top_left_x, r_top_left_y, entry = room_stack.pop()
+    # for each direction, try to build a corridor
+
+    # for each direction
+    for direction in range(4):
+        if not entry == direction: #and something probabilistic
+            if direction == UP or direction == DOWN:
+                rnd = random.randint(0, room.shape[1])
+                end_loop = room.shape[0]
+            else:
+                rnd = random.randint(0, room.shape[0])
+                end_loop = room.shape[1]
+            # find the coordinate of the right wall
+            for i in end_loop:
+                if room[i][rnd] == ROOM_FLOOR:
+                    break
+
+            if direction == UP:
+                x = rnd + r_top_left_x
+                y = i+r_top_left_y - 1
+            if direction == RIGHT:
+                x = rnd + r_top_left_x + 1
+                y = i+r_top_left_y
+            if direction == DOWN:
+                x = rnd + r_top_left_x
+                y = i+r_top_left_y + 1
+            if direction == LEFT:
+                x = rnd + r_top_left_x
+                y = i+r_top_left_y - 1
+            
+
+
+            failure, new_room, new_top_left_x, new_top_left_y, new_entry = generate_corridor_and_room(TRY_NUMBER_CORRIDOR, TRY_NUMBER_ROOM, x, y, UP)
+            if not failure:
+                room_stack.append((new_room, new_top_left_x, new_top_left_y, new_entry))
+            else:
+                pass
+
+
+
 #place_room(2,50,"L")
 
 
