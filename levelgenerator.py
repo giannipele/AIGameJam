@@ -24,7 +24,7 @@ DOWN = 2
 LEFT = 3
 
 ROOM_FLOOR = 1
-
+n_rooms = 0
 
 def column(matrix, i):
     return [row[i] for row in matrix.getA()]
@@ -34,7 +34,7 @@ def column(matrix, i):
 # INPUT: same as find_room() but with a candidate room
 # OUTPUT: -1 is room cannot be placed
 #         useable coordinates x, y if it can. (TOP LEFT)
-def can_be_placed(room, x, y, side):
+def room_can_be_placed(room, x, y, side):
     # Do we need to find a place to put the room along the x or y axis?
     width = len(room.getA()[0])
     height = len(room.getA())
@@ -116,8 +116,8 @@ def find_room(x,y,side):
         room = roomGenerator.generate_random_room()
         for line in room.getA():
             print(line)
-        if can_be_placed(room, x, y, side) != -1:
-            return room, can_be_placed(room, x, y, side)
+        if room_can_be_placed(room, x, y, side) != -1:
+            return room, room_can_be_placed(room, x, y, side)
         tries += 1
     return -1, -1, -1
 
@@ -187,18 +187,20 @@ def generate_corridor_and_room(n, m, x, y, direction):
     entry = None
 
     for _ in range(n):
+        global n_rooms
         corridor, ending_point, starting_point, end_direction = cor_generator.generate(direction)
         if corridor_can_be_placed(corridor, x, y, starting_point[0], starting_point[1]):
             for __ in range(m):
                 room = roomGenerator.generate_random_room()
                 r_top_left_x, r_top_left_y = room_can_be_placed(room, ending_point[0], ending_point[1], direction)
-                if d_top_left_x != -1:
+                if r_top_left_x != -1:
 
                     # get the topleft coordinate of the corridor matrix IN the dungeon matrix
                     c_top_left_x = x - starting_point[0]
                     c_top_left_y = y - starting_point[1]
                     # place the room
-                    place_relement(room, r_top_left_x, r_top_left_y)
+                    place_element(room, r_top_left_x, r_top_left_y)
+                    n_rooms += 1
                     place_element(corridor, c_top_left_x, c_top_left_y)
                     failure = False
 
@@ -218,6 +220,16 @@ def generate_corridor_and_room(n, m, x, y, direction):
 
     return failure
 
+def chance_generate_corridor():
+    for i in range(n_rooms):
+        # for top and bottom wall
+        for i in range(2):
+            if n_rooms == 1:
+                return 1
+            elif n_rooms < 7:
+                return 0.85
+            else:
+                return 0.3 / n_rooms
 # CHANCE TO GENERATE CORRIDOR:
 # FOR EACH GENERATED ROOM:
 #   FOR BOTH TOP AND RIGHT WALL:
