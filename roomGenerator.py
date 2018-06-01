@@ -1,3 +1,9 @@
+# Author: William J Kavanagh -- You're welcome, world.
+# Date: 1/6/18
+#
+# generate_room() / generate_big_room() / generate_huge_room()
+# or generate_random_room() if you're mad.
+
 import random
 import numpy as np
 
@@ -118,7 +124,7 @@ def extend_bottom_right(room):
     room[7][7] = 1
     room[7][6] = 1
 
-def generate():
+def generate_room():
     room = [[],[],[],[],[],[],[],[]]
     for i in range(len(room)):
         line = []
@@ -180,6 +186,30 @@ def generate():
             if room[j][i] == 0 or room[j][i] == 1:
                 line += [room[j][i]]
         bounded += [line]
+    return np.matrix(bounded)
 
-    return_matrix = np.matrix(bounded)
-    return return_matrix
+def matrix_reflect_y(matrix):
+    return np.hstack((matrix,np.flip(matrix,1)))
+
+def matrix_reflect_x(matrix):
+    return np.vstack((matrix,np.flip(matrix,0)))
+
+def generate_big_room():
+    if random.randint(1,2) == 1:
+        return matrix_reflect_x(generate_room())
+    return matrix_reflect_y(generate_room())
+
+def generate_huge_room():
+    return matrix_reflect_x(matrix_reflect_y(generate_room()))
+
+def generate_random_room():
+    seed = random.randint(1,3)
+    if seed == 1:
+        return generate_room()
+    elif seed == 2:
+        return generate_big_room()
+    return generate_huge_room()
+
+huge_room = generate_random_room()
+for line in huge_room:
+    print(line)
