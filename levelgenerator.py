@@ -10,8 +10,8 @@ RIGHT = 1
 DOWN = 2
 LEFT = 3
 
-def column(maxtrix, i):
-    return [row[i] for row in matrix]
+def column(matrix, i):
+    return [row[i] for row in matrix.getA()]
 
 # Find if a room can be placed and where.
 #
@@ -20,16 +20,18 @@ def column(maxtrix, i):
 #         useable coordinates x, y if it can. (TOP LEFT)
 def can_be_placed(room, x, y, side):
     # Do we need to find a place to put the room along the x or y axis?
-    width = len(room[0])
-    height = len(room)
+    width = len(room.getA()[0])
+    height = len(room.getA())
     if side == UP or side == DOWN:
         entry_range = width
     else:
         entry_range = height
 
-    entry_attempt = random.randint(0,entry_range)   # Pick a random corridor entry point
+    entry_attempt = random.randint(0,entry_range-1)   # Pick a random corridor entry point
+    print ("RANDOM START CHOSEN:", entry_attempt)
 
     for i in range(entry_range):          # Will try for all possible corridor entries..
+        index = 99
         candidate_x = -1
         candidate_y = -1
         # Setup candidate co-ords
@@ -37,7 +39,7 @@ def can_be_placed(room, x, y, side):
             candidate_x = x - (entry_attempt + i) % width
             if side == UP:
                 candidate_column = column(room, entry_attempt)
-                for index in range(len(candidate_column), -1, -1):
+                for index in range(len(candidate_column) -1, -1, -1):
                     if candidate_column[index] == 1:
                         break
                 candidate_y = y + height - index
@@ -48,15 +50,16 @@ def can_be_placed(room, x, y, side):
         else:
             candidate_y = y - (entry_attempt + i) % height
             if side == LEFT:
-                for index in range(len(room[entry_attempt]), -1, -1):
+                for index in range(len(room[entry_attempt]) -1, -1, -1):
                     if room.getA()[entry_attempt][index] == 1:
                         break
                 candidate_x = x - width + index
             else:
                 for index in range(len(room.getA()[entry_attempt])):
+                    print("index:", index, "result:", room.getA()[entry_attempt][index])
                     if room.getA()[entry_attempt][index] == 1:
                         break
-                candidate_y = x - index
+                candidate_x = x - index
 
         room_placeable = True
         print("CANDIDATES:",candidate_x, candidate_y)
@@ -93,6 +96,8 @@ def find_room(x,y,side):
     num_attempts = 5
     while tries < num_attempts:
         room = roomGenerator.generate_random_room()
+        for line in room.getA():
+            print(line)
         if can_be_placed(room, x, y, side) != -1:
             return room, can_be_placed(room, x, y, side)
         tries += 1
@@ -194,7 +199,7 @@ room_stack = []
 # Add entrance..
 dungeon[0,50] = 2
 dungeon[1,50] = 2
-print(find_room(2,50,DOWN))
+print(find_room(2,50,RIGHT))
 #place_room(2,50,"L")
 
 
