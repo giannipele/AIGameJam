@@ -7,7 +7,7 @@ import random
 
 # PARAMETER
 
-MATRIX_DUNGEON_SIZE = 100
+MATRIX_DUNGEON_SIZE = 200
 MATRIX_CORRIDOR_SIZE = 8
 MIN_LENGTH_CORRIDOR = 3
 MAX_LENGTH_CORRIDOR = 10
@@ -87,7 +87,7 @@ def can_be_placed(room, x, y, side):
         if candidate_x < 0 or candidate_y < 0:
             continue
            # too low or too far right?
-        if candidate_x + width >= 100 or candidate_y + height >= 100:
+        if candidate_x + width >= MATRIX_DUNGEON_SIZE or candidate_y + height >= MATRIX_DUNGEON_SIZE:
           continue
 
         # Check room is placeable in dungeon for candidate
@@ -213,7 +213,7 @@ def generate_corridor_and_room(n, m, x, y, direction):
 
                     break # finished
 
-    
+
     return failure, room, r_top_left_x, r_top_left_y, entry
 
     return failure
@@ -284,8 +284,6 @@ while room_stack:
             if direction == LEFT:
                 x = rnd + r_top_left_x
                 y = i+r_top_left_y - 1
-            
-
 
             failure, new_room, new_top_left_x, new_top_left_y, new_entry = generate_corridor_and_room(TRY_NUMBER_CORRIDOR, TRY_NUMBER_ROOM, x, y, UP)
             if not failure:
@@ -293,10 +291,6 @@ while room_stack:
             else:
                 pass
 
-dungeon[50,99] = 2
-dungeon[50,98] = 2
-print(find_room(50,97,UP))
-#place_room(2,50,"L")
 
 
 # for each non entry room, try to place corridor + room
