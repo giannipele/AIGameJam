@@ -189,6 +189,15 @@ def generate_corridor_and_room(n, m, x, y, direction):
 
     return failure
 
+# CHANCE TO GENERATE CORRIDOR:
+# FOR EACH GENERATED ROOM:
+#   FOR BOTH TOP AND RIGHT WALL:
+#       IF NUM_ROOMS == 1:
+#           CHANCE OF GENERATING A CORRIDOR = 1
+#       ELIF NUM_ROOMS < 7:
+#           CHANCE OF GENERATING A CORRIDOR = 0.85
+#       ELSE:
+#           CHANCE OF GENERATING A CORRIDOR = 0.3 / NUM_ROOMS
 
 
 
