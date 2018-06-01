@@ -20,7 +20,6 @@ def column(maxtrix, i):
 #         useable coordinates x, y if it can. (TOP LEFT)
 def can_be_placed(room, x, y, side):
     # Do we need to find a place to put the room along the x or y axis?
-
     width = len(room[0])
     height = len(room)
     if side == UP or side == DOWN:
@@ -37,31 +36,28 @@ def can_be_placed(room, x, y, side):
         if side == UP or side == DOWN:
             candidate_x = x - (entry_attempt + i) % width
             if side == UP:
-                #FIXME
                 candidate_column = column(room, entry_attempt)
-                for index in range(len(candidate_column), -2, -1):
+                for index in range(len(candidate_column), -1, -1):
                     if candidate_column[index] == 1:
                         break
-                # FIND LAST INDEX OF 0
-                if index == -1:
-                    continue
                 candidate_y = y + height - index
 
             else:
-                #FIXME
-                candidate_y = y
+                candidate_column = column(room, entry_attempt)
+                candidate_y = y - candidate_column.index(1)
         else:
             candidate_y = y - (entry_attempt + i) % height
             if side == LEFT:
-                for index in range(len(room[entry_attempt]), -2, -1):
-                    if room[entry_attempt][index] == 1:
+                for index in range(len(room[entry_attempt]), -1, -1):
+                    if room.getA()[entry_attempt][index] == 1:
                         break
-                # FIND LAST INDEX OF 0
-                if index == -1:
-                    continue
                 candidate_x = x - width + index
             else:
-                candidate_y = x - room[entry_attempt].index(i)
+                for index in range(len(room.getA()[entry_attempt])):
+                    if room.getA()[entry_attempt][index] == 1:
+                        break
+                candidate_y = x - index
+
         room_placeable = True
         print("CANDIDATES:",candidate_x, candidate_y)
 
@@ -76,8 +72,9 @@ def can_be_placed(room, x, y, side):
         # Check room is placeable in dungeon for candidate
         for i in range(width):
             for j in range(height):
-                if dungeon[candidate_y + j][candidate_x + i] > 0 and room[j][i] > 0:
+                if dungeon[candidate_y + j][candidate_x + i] > 0 and room.getA()[j][i] > 0:
                     room_placeable = False
+                    break
         # Return if successful.
         if room_placeable:
             return candidate_x, candidate_y
@@ -118,7 +115,7 @@ def corridor_can_be_placed(corridor_matrix, x_d, y_d, x_c, y_c):
     failure = False
     finish = False
 
-    
+
     last_direction = None
 
     while not finish:
@@ -182,8 +179,8 @@ def generate_corridor_and_room(n, m, x, y, direction):
                     failure = False
                     break # finished
 
-    
-    return failure   
+
+    return failure
 
 
 
