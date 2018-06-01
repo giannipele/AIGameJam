@@ -28,7 +28,6 @@ def can_be_placed(room, x, y, side):
         entry_range = height
 
     entry_attempt = random.randint(0,entry_range-1)   # Pick a random corridor entry point
-    print ("RANDOM START CHOSEN:", entry_attempt)
 
     for i in range(entry_range):          # Will try for all possible corridor entries..
         index = 99
@@ -37,39 +36,42 @@ def can_be_placed(room, x, y, side):
         # Setup candidate co-ords
         if side == UP or side == DOWN:
             candidate_x = x - (entry_attempt + i) % width
+
             if side == UP:
-                candidate_column = column(room, entry_attempt)
+                candidate_column = column(room, (entry_attempt + i) % width)
                 for index in range(len(candidate_column) -1, -1, -1):
                     if candidate_column[index] == 1:
                         break
-                candidate_y = y + height - index
+                candidate_y = y - index
 
             else:
                 candidate_column = column(room, entry_attempt)
                 candidate_y = y - candidate_column.index(1)
         else:
             candidate_y = y - (entry_attempt + i) % height
+
+
             if side == LEFT:
-                for index in range(len(room[entry_attempt]) -1, -1, -1):
+                for index in range(len(room.getA()[entry_attempt]) -1, -1, -1):
                     if room.getA()[entry_attempt][index] == 1:
                         break
-                candidate_x = x - width + index
+                candidate_x = x - index
+
+
             else:
                 for index in range(len(room.getA()[entry_attempt])):
-                    print("index:", index, "result:", room.getA()[entry_attempt][index])
                     if room.getA()[entry_attempt][index] == 1:
                         break
                 candidate_x = x - index
 
         room_placeable = True
-        print("CANDIDATES:",candidate_x, candidate_y)
 
         # Check co-ordinates fall within the grid confines..
            # too high or too far left?
         if candidate_x < 0 or candidate_y < 0:
             continue
            # too low or too far right?
-        if candidate_x + width >= 1000 or candidate_y + height >= 1000:
+        if candidate_x + width >= 100 or candidate_y + height >= 100:
           continue
 
         # Check room is placeable in dungeon for candidate
@@ -93,7 +95,7 @@ def can_be_placed(room, x, y, side):
 #         -1 if none can be found.
 def find_room(x,y,side):
     tries = 0
-    num_attempts = 5
+    num_attempts = 1
     while tries < num_attempts:
         room = roomGenerator.generate_random_room()
         for line in room.getA():
@@ -197,9 +199,9 @@ dungeon = np.zeros((100,100))
 room_stack = []
 
 # Add entrance..
-dungeon[0,50] = 2
-dungeon[1,50] = 2
-print(find_room(2,50,RIGHT))
+dungeon[50,99] = 2
+dungeon[50,98] = 2
+print(find_room(50,97,UP))
 #place_room(2,50,"L")
 
 
