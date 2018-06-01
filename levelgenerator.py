@@ -114,10 +114,12 @@ def find_room(x,y,side):
     num_attempts = 1
     while tries < num_attempts:
         room = roomGenerator.generate_random_room()
+        #print(room)
         for line in room.getA():
             print(line)
         if room_can_be_placed(room, x, y, side) != -1:
-            return room, room_can_be_placed(room, x, y, side)
+            can_be = room_can_be_placed(room, x, y, side)
+            return room, can_be
         tries += 1
     return -1, -1, -1
 
@@ -249,7 +251,13 @@ room_stack = []
 
 
 # Add entrance..
+dungeon_start = (random.randint(MATRIX_DUNGEON_SIZE/2, MATRIX_DUNGEON_SIZE))
+dungeon[0][dungeon_start] = 2
+dungeon[1][dungeon_start] = 2
 
+first_room, coord = find_room(2, dungeon_start, RIGHT)
+#first_room, x, y = find_room(2, dungeon_start, RIGHT)
+room_stack.append((first_room, coord[0], coord[1], RIGHT))
 
 while room_stack:
     room, r_top_left_x, r_top_left_y, entry = room_stack.pop()
@@ -272,17 +280,29 @@ while room_stack:
 
 
         if not entry == direction and rnd_room <= threeshold:
-
+            print(direction)
             if direction == UP or direction == DOWN:
                 rnd = random.randint(0, room.shape[1])
+                print("rnd")
                 end_loop = room.shape[0]
+                for i in range(end_loop):
+                    print("check")
+                    print(room)
+                    print(ROOM_FLOOR)
+                    if room[i][rnd] == ROOM_FLOOR:
+                        break
             else:
                 rnd = random.randint(0, room.shape[0])
                 end_loop = room.shape[1]
             # find the coordinate of the right wall
-            for i in end_loop:
-                if room[i][rnd] == ROOM_FLOOR:
-                    break
+                print(direction)
+                print(end_loop)
+                for i in range(end_loop):
+                    print("check")
+                    print(room)
+                    print(ROOM_FLOOR)
+                    if room[rnd][i] == ROOM_FLOOR:
+                        break
 
             if direction == UP:
                 x = rnd + r_top_left_x
