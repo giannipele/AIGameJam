@@ -235,10 +235,9 @@ cor_generator = Corridor_generator(MATRIX_CORRIDOR_SIZE, MIN_LENGTH_CORRIDOR, MA
 dungeon = np.zeros((MATRIX_DUNGEON_SIZE,MATRIX_DUNGEON_SIZE))
 room_stack = []
 
+
 # Add entrance..
 
-dungeon[0,50] = 2
-dungeon[1,50] = 2
 
 while room_stack:
     room, r_top_left_x, r_top_left_y, entry = room_stack.pop()
@@ -246,7 +245,22 @@ while room_stack:
 
     # for each direction
     for direction in range(4):
-        if not entry == direction: #and something probabilistic
+        if direction == DOWN or direction == LEFT:
+            continue
+
+
+        rnd_room = random.random()
+
+        if n_rooms <= 1:
+            threeshold = 1
+        elif n_rooms <= 7:
+            threeshold = 0.85
+        else:
+            threeshold = 0.3 / n_rooms
+
+
+        if not entry == direction and rnd_room <= threeshold:
+
             if direction == UP or direction == DOWN:
                 rnd = random.randint(0, room.shape[1])
                 end_loop = room.shape[0]
